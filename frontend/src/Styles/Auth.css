@@ -1,0 +1,728 @@
+/* Auth.css - Premium Black & White Theme */
+
+/* General Styles & CSS Reset */
+body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: sans-serif;
+    min-height: 100vh; /* Ensure full height */
+}
+
+/* Layout and Card Styles */
+.login-container,
+.register-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.login-card,
+.register-card {
+    flex: 1;
+    max-width: 500px; /* Slightly wider for register */
+    background: #111;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #222;
+    position: relative; /* For back button */
+}
+
+/* Header Styles */
+.login-header,
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h2,
+.register-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.login-header p,
+.register-header p {
+    color: #999;
+    font-size: 1rem;
+}
+
+/* Logo Styles */
+.logo {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.logo-text {
+    color: #fff;
+}
+
+.logo-accent {
+    background: linear-gradient(45deg, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Form Styles */
+.login-form,
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ccc;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.input-icon {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.input-container {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #555;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.form-input::placeholder {
+    color: #666;
+}
+
+/* Password Styles */
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #fff;
+}
+
+/* Button Styles */
+.login-button,
+.register-button {
+    padding: 14px 20px;
+    background: linear-gradient(45deg, #333, #555);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.login-button:hover:not(:disabled),
+.register-button:hover:not(:disabled) {
+    background: linear-gradient(45deg, #444, #666);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.login-button:disabled,
+.register-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Spinner Styles */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Feature Section Styles */
+.login-features,
+.register-features {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%23222" stroke-width="1"/></svg>');
+}
+
+.features-container {
+    max-width: 500px;
+}
+
+.features-container h3 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: #fff;
+    text-align: center;
+}
+
+.features-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.feature-icon {
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.feature h4 {
+    color: #fff;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.feature p {
+    color: #999;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Message Box Styles */
+.message-box {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.message-box.error {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.message-icon {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+/* Specific Login Page Styles */
+.login-card {
+    max-width: 480px;
+}
+
+.login-form .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.login-form .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ccc;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.login-form .remember-me input {
+    accent-color: #fff;
+}
+
+.login-form .forgot-password {
+    color: #999;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+
+.login-form .forgot-password:hover {
+    color: #fff;
+}
+
+.login-footer {
+    margin-top: auto;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+}
+
+.login-footer p {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.login-footer .signup-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.login-footer .signup-link:hover {
+    color: #ccc;
+    text-decoration: underline;
+}
+
+.demo-section {
+    margin: 30px 0;
+    padding: 20px 0;
+    border-top: 1px solid #222;
+}
+
+.demo-toggle {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #999;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.demo-toggle:hover {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: #444;
+}
+
+.demo-options {
+    margin-top: 15px;
+    padding: 15px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 1px solid #222;
+}
+
+.demo-options h4 {
+    color: #fff;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.demo-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.demo-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.demo-btn.user {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.demo-btn.storeowner {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.demo-btn.admin {
+    background: rgba(156, 39, 176, 0.1);
+    color: #9C27B0;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+.demo-btn.super-admin {
+    background: rgba(255, 193, 7, 0.1);
+    color: #FFC107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.demo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific Register Page Styles */
+.register-card .back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #999;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.register-card .back-button:hover {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: #444;
+}
+
+.register-form .form-input.error {
+    border-color: #ff6b6b;
+}
+
+.register-form .error-text {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+.register-form .terms-agreement {
+    margin: 10px 0;
+}
+
+.register-form .terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #ccc;
+    font-size: 0.9rem;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.register-form .terms-checkbox input {
+    margin-top: 3px;
+    accent-color: #fff;
+}
+
+.register-form .terms-checkbox a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.register-form .terms-checkbox a:hover {
+    text-decoration: underline;
+}
+
+.register-footer {
+    margin-top: 30px;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+}
+
+.register-footer p {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.register-footer .login-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-footer .login-link:hover {
+    color: #ccc;
+    text-decoration: underline;
+}
+
+.register-card .role-notice {
+    margin-top: 20px;
+    padding: 15px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+}
+
+.register-card .notice-icon {
+    color: #ffc107;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.register-card .role-notice p {
+    color: #ccc;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.register-card .role-notice strong {
+    color: #fff;
+}
+
+/*email display*/
+.email-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+    color: #495057;
+    border: 1px solid #e9ecef;
+}
+
+.email-display svg {
+    color: #667eea;
+}
+
+/* Success state */
+.success-state {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.success-icon {
+    font-size: 3rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+.success-state h3 {
+    color: #28a745;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.success-state p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* OTP footer */
+.otp-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.otp-footer p {
+    color: #6c757d;
+    margin: 0;
+}
+
+.resend-link {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: inherit;
+    padding: 0;
+}
+
+.resend-link:hover:not(:disabled) {
+    color: #5a67d8;
+}
+
+.resend-link:disabled {
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Message box styles */
+.message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-box.success .message-icon {
+    color: #155724;
+}
+
+/* Input mode for OTP */
+input[inputmode="numeric"] {
+    text-align: center;
+    font-size: 1.2rem;
+    letter-spacing: 0.5rem;
+    font-weight: 600;
+}
+
+/* Countdown animation */
+@keyframes countdown {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.7;
+    }
+}
+
+.resend-link:disabled {
+    animation: countdown 1s infinite alternate;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+
+    .login-container,
+    .register-container {
+        flex-direction: column;
+    }
+
+    .login-card,
+    .register-card {
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #222;
+    }
+
+    .login-features,
+    .register-features {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .login-card,
+    .register-card {
+        padding: 25px 20px;
+    }
+
+    .login-form .demo-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .login-form .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .login-form .forgot-password {
+        margin-left: auto;
+    }
+
+    .register-card .back-button {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 20px;
+        align-self: flex-start;
+    }
+
+    .register-header {
+        margin: 0 0 20px 0;
+    }
+}
+
+/* Responsive design for OTP page */
+@media (max-width: 768px) {
+    .email-display {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    input[inputmode="numeric"] {
+        font-size: 1.1rem;
+        letter-spacing: 0.3rem;
+    }
+
+    .success-icon {
+        font-size: 2.5rem;
+    }
+
+    .success-state h3 {
+        font-size: 1.3rem;
+    }
+}
