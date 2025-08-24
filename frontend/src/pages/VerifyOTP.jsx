@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { 
   FaKey, FaArrowLeft, FaCheckCircle, FaEnvelope, FaInfoCircle, FaClock 
 } from "react-icons/fa";
-import "../Styles/Verifyotp.css";
+import "../Styles/verifyotp.css";
 
 export default function VerifyOTP() {
   const navigate = useNavigate();
