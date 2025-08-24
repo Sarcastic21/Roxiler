@@ -1,0 +1,8 @@
+1- i have used OTP veryfication for registration so u need to make .env file with your email passowrd 
+
+2 - Admin , Superadmin , user , storeowner all can login from login page , but only user can register , and admin and store owner were created by super admin 
+
+SUPER_ADMIN_EMAIL='superadmin@example.com'
+SUPER_ADMIN_PASSWORD='admin123'
+
+u can use this as to login in super admin 
