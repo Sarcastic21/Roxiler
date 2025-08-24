@@ -67,26 +67,7 @@ app.get('/api/health', (req, res) => res.json({
 }));
 
 // Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../frontend/build');
-  
-  // Serve static files from React build
-  app.use(express.static(frontendPath));
-  
-  // Handle React routing, return all requests to React app
-  // CORRECT: Use /* wildcard parameter instead of *
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}
 
-// 404 handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
-    error: 'API endpoint not found',
-    path: req.originalUrl 
-  });
-});
 
 // General error handling
 app.use((err, req, res, next) => {
