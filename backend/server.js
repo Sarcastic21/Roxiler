@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://your-frontend-domain.vercel.app',
+  'https://roxiler-xvoi.vercel.app',
   'https://storehub-frontend.onrender.com' // Add your actual frontend domain
 ];
 
