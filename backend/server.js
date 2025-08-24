@@ -13,14 +13,13 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Hardcoded allowed origins
+// CORS: Only allow frontend origins
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://your-frontend-domain.vercel.app'
 ];
 
-// Middleware
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
@@ -28,13 +27,19 @@ app.use(cors({
   },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Initialize database
-initializeDatabase()
-  .then(() => console.log('✅ Database initialized'))
-  .catch(err => console.error('❌ DB init failed:', err));
+(async () => {
+  try {
+    await initializeDatabase();
+    console.log('✅ Database initialized');
+  } catch (err) {
+    console.error('❌ DB init failed:', err);
+  }
+})();
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -43,9 +48,7 @@ app.use('/api/super-admin', superAdminRoutes);
 app.use('/api/stores', storeRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date() });
-});
+app.get('/api/health', (req, res) => res.json({ status: 'OK', timestamp: new Date() }));
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
