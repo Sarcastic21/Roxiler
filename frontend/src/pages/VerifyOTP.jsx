@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { verifyOTP, resendOTP } from "../api/api.js";
 import { useLocation, useNavigate } from "react-router-dom";
-import { 
-  FaKey, FaArrowLeft, FaCheckCircle, FaEnvelope, FaInfoCircle, FaClock 
+import {
+  FaKey, FaArrowLeft, FaCheckCircle, FaEnvelope, FaInfoCircle, FaClock
 } from "react-icons/fa";
 import "../Styles/verifyotp.css";
 
@@ -10,7 +10,8 @@ export default function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
-  
+  const type = location.state?.type || "register"; //Get type from state, either register or reset
+
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,37 +47,61 @@ export default function VerifyOTP() {
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validateForm()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
-  setLoading(true);
-  setMessage("");
-  
-  try {
-    const res = await verifyOTP({ email, otp });
-    setMessage(res.message);
+    setLoading(true);
+    setMessage("");
 
-    if (res.message === "Email verified successfully. Registration completed!") {
-      setSuccess(true);
-      setTimeout(() => {
-        navigate("/login", { 
-          state: { 
-            message: "Email verified successfully! You can now login.",
-            email: email // Pass email to pre-fill login form
-          } 
-        });
-      }, 2000);
+    try {
+      const res = await verifyOTP({ email, otp });
+      setMessage(res.message);
+      //Different navigation for different process
+      if (type === "reset") {
+        //If reset go to reset password
+        if (res.message === "OTP verified successfully.") { // Change message if different
+          setSuccess(true);
+          setTimeout(() => {
+            navigate("/reset-password", {
+              state: {
+                email: email // Pass email to reset password form
+              }
+            });
+          }, 2000);
+        }
+      }
+      else {
+        //if register go to login
+        if (res.message === "Email verified successfully. Registration completed!") {
+          setSuccess(true);
+          setTimeout(() => {
+            navigate("/login", {
+              state: {
+                message: "Email verified successfully! You can now login.",
+                email: email // Pass email to pre-fill login form
+              }
+            });
+          }, 2000);
+        }
+      }
+
+
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setMessage(error.response?.data?.message || "Verification failed. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleBack = () => {
-    navigate("/register");
+    //Different back navigation
+    if (type === "reset") {
+      navigate("/forgot-password");
+    } else {
+      navigate("/register");
+    }
+
   };
 
   const handleResendOTP = async () => {
@@ -121,7 +146,7 @@ const handleSubmit = async (e) => {
       {/* Right Card Section */}
       <div className="register-card">
         <button className="back-button" onClick={handleBack}>
-          <FaArrowLeft /> Back to Register
+          <FaArrowLeft /> Back to {type === "reset" ? "Forgot Password" : "Register"}
         </button>
 
         <div className="register-header">
@@ -140,7 +165,7 @@ const handleSubmit = async (e) => {
           <div className="success-state">
             <FaCheckCircle className="success-icon" />
             <h3>Email Verified Successfully!</h3>
-            <p>Redirecting to login page...</p>
+            <p>Redirecting to {type === "reset" ? "reset password" : "login"} page...</p>
           </div>
         ) : (
           <>
@@ -172,8 +197,8 @@ const handleSubmit = async (e) => {
                 {errors.otp && <span className="error-text">{errors.otp}</span>}
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="register-button"
                 disabled={loading || otp.length !== 6}
               >
@@ -193,7 +218,7 @@ const handleSubmit = async (e) => {
             <div className="resend-section">
               <p>
                 Didn’t receive the code?{" "}
-                <button 
+                <button
                   className="resend-button"
                   onClick={handleResendOTP}
                   disabled={countdown > 0}
@@ -206,7 +231,7 @@ const handleSubmit = async (e) => {
             <div className="role-notice">
               <div className="notice-icon"><FaInfoCircle /></div>
               <p>
-                <strong>Note:</strong> Check your spam folder if you don't see the email. 
+                <strong>Note:</strong> Check your spam folder if you don't see the email.
                 The code will expire after 10 minutes.
               </p>
             </div>
