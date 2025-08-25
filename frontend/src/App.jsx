@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
-import VerifyOTP from "./pages/VerifyOTP.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
@@ -22,11 +20,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Private Routes */}
           <Route
             path="/user"
             element={
