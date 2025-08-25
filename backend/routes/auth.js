@@ -176,45 +176,52 @@ router.post('/verify-otp', [
 
     const { email, otp } = req.body;
 
-    // Check if OTP exists and is valid
     const otpData = otpStore[email];
     if (!otpData || otpData.otp !== otp) {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    // Check if OTP has expired
     if (Date.now() > otpData.expires) {
       delete otpStore[email];
-      delete pendingRegistrations[email];
       return res.status(400).json({ message: 'OTP has expired' });
     }
 
-    // Check if pending registration exists
-    const pendingUser = pendingRegistrations[email];
-    if (!pendingUser) {
-      return res.status(400).json({ message: 'No pending registration found' });
+    // Check the purpose of the OTP
+    if (otpData.purpose === 'password_reset') {
+      // Password reset verification
+
+      delete otpStore[email]; // Remove OTP after successful verification
+      return res.json({ message: 'OTP verified successfully.' }); // Different message for password reset
+
+    } else {
+      // Registration verification
+      const pendingUser = pendingRegistrations[email];
+      if (!pendingUser) {
+        return res.status(400).json({ message: 'No pending registration found' });
+      }
+
+      // Create the user in the database (as before)
+      const newUser = await pool.query(
+        `INSERT INTO users (username, email, password, address, role, verified) 
+         VALUES (\$1, \$2, \$3, \$4, \$5, \$6) RETURNING id, username, email, address, role, verified`,
+        [pendingUser.username, pendingUser.email, pendingUser.password, pendingUser.address, 'user', true]
+      );
+
+      // Clean up
+      delete otpStore[email];
+      delete pendingRegistrations[email];
+
+      return res.json({
+        message: 'Email verified successfully. Registration completed!',
+        userId: newUser.rows[0].id,
+        user: {
+          id: newUser.rows[0].id,
+          username: newUser.rows[0].username,
+          email: newUser.rows[0].email
+        }
+      });
     }
 
-    // ✅ NOW CREATE THE USER IN DATABASE (verified)
-    const newUser = await pool.query(
-      `INSERT INTO users (username, email, password, address, role, verified) 
-       VALUES (\$1, \$2, \$3, \$4, \$5, \$6) RETURNING id, username, email, address, role, verified`,
-      [pendingUser.username, pendingUser.email, pendingUser.password, pendingUser.address, 'user', true]
-    );
-
-    // Clean up
-    delete otpStore[email];
-    delete pendingRegistrations[email];
-
-    res.json({
-      message: 'Email verified successfully. Registration completed!',
-      userId: newUser.rows[0].id,
-      user: {
-        id: newUser.rows[0].id,
-        username: newUser.rows[0].username,
-        email: newUser.rows[0].email
-      }
-    });
   } catch (error) {
     console.error('OTP verification error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -362,9 +369,9 @@ router.post('/forgot-password', [
 });
 
 // Reset password with OTP
+// Reset password with OTP (NO OTP NEEDED NOW)
 router.post('/reset-password', [
   body('email').isEmail().withMessage('Please provide a valid email'),
-  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
   body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ], async (req, res) => {
   try {
@@ -373,17 +380,7 @@ router.post('/reset-password', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, otp, newPassword } = req.body;
-
-    const otpData = otpStore[email];
-    if (!otpData || otpData.otp !== otp || otpData.purpose !== 'password_reset') {
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
-
-    if (Date.now() > otpData.expires) {
-      delete otpStore[email];
-      return res.status(400).json({ message: 'OTP has expired' });
-    }
+    const { email, newPassword } = req.body;
 
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -393,7 +390,6 @@ router.post('/reset-password', [
       [hashedPassword, email]
     );
 
-    delete otpStore[email];
     res.json({ message: 'Password reset successfully' });
   } catch (error) {
     console.error('Reset password error:', error);
