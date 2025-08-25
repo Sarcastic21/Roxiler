@@ -10,9 +10,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 const router = express.Router();
 
-// In-memory storage for OTP (consider using Redis in production)
 const otpStore = {};
-const pendingRegistrations = {}; // Store pending registrations until OTP verification
+const pendingRegistrations = {};
 
 // Email transporter for OTP
 const transporter = nodemailer.createTransport({
@@ -28,15 +27,39 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Send OTP email
-async function sendOTPEmail(email, otp) {
+// Send OTP email (Enhanced with black and white theme)
+async function sendOTPEmail(email, otp, purpose = 'registration') {
+  let subject, html;
+
+  if (purpose === 'password_reset') {
+    subject = 'Password Reset OTP Code';
+    html = `
+      <div style="font-family: Arial, sans-serif; color: #fff; background-color: #111; padding: 20px;">
+        <h2 style="color: #fff; border-bottom: 1px solid #222; padding-bottom: 10px;">Password Reset Request</h2>
+        <p style="color: #999;">You have requested to reset your password. Use the following OTP code to proceed:</p>
+        <p style="font-size: 1.2rem; color: #fff;"><strong>${otp}</strong></p>
+        <p style="color: #999;">This code will expire in 10 minutes.</p>
+        <p style="color: #999;">If you didn't request a password reset, please ignore this email.</p>
+      </div>
+    `;
+  } else {
+    subject = 'Your OTP Code for Registration';
+    html = `
+      <div style="font-family: Arial, sans-serif; color: #fff; background-color: #111; padding: 20px;">
+        <h2 style="color: #fff; border-bottom: 1px solid #222; padding-bottom: 10px;">Registration OTP</h2>
+        <p style="color: #999;">Thank you for registering! Use the following OTP code to verify your email:</p>
+        <p style="font-size: 1.2rem; color: #fff;"><strong>${otp}</strong></p>
+        <p style="color: #999;">This code will expire in 10 minutes.</p>
+      </div>
+    `;
+  }
+
   try {
     await transporter.sendMail({
       from: process.env.NODEMAILER_EMAIL,
       to: email,
-      subject: 'Your OTP Code for Registration',
-      html: `<p>Your OTP code for registration is: <strong>${otp}</strong></p>
-             <p>This code will expire in 10 minutes.</p>`
+      subject: subject,
+      html: html
     });
     return true;
   } catch (error) {
@@ -49,14 +72,14 @@ async function sendOTPEmail(email, otp) {
 async function initializeSuperAdmin() {
   try {
     const result = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      'SELECT * FROM users WHERE email = \$1',
       ['superadmin@example.com']
     );
     if (result.rows.length === 0) {
       const hashedPassword = await bcrypt.hash('admin123', 10);
       await pool.query(
         `INSERT INTO users (username, email, password, address, role, verified) 
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES (\$1, \$2, \$3, \$4, \$5, \$6)`,
         ['superadmin', 'superadmin@example.com', hashedPassword, 'none', 'super_admin', true]
       );
       console.log('Super admin created successfully');
@@ -67,8 +90,7 @@ async function initializeSuperAdmin() {
 }
 initializeSuperAdmin();
 
-// Register user - STORE TEMPORARY DATA, DON'T CREATE USER YET
-// Register user - STORE TEMPORARY DATA, DON'T CREATE USER YET
+
 router.post('/register', [
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -84,7 +106,7 @@ router.post('/register', [
 
     // Check if user already exists in database (verified users)
     const userResult = await pool.query(
-      'SELECT * FROM users WHERE email = $1 OR username = $2',
+      'SELECT * FROM users WHERE email = \$1 OR username = \$2',
       [email, username]
     );
 
@@ -129,7 +151,7 @@ router.post('/register', [
       return res.status(500).json({ message: 'Failed to send OTP email' });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'OTP sent to email. Please verify to complete registration.',
       email: email,
       redirectTo: '/verify-otp',  // ✅ Tell frontend to navigate to verify-otp page
@@ -176,7 +198,7 @@ router.post('/verify-otp', [
     // ✅ NOW CREATE THE USER IN DATABASE (verified)
     const newUser = await pool.query(
       `INSERT INTO users (username, email, password, address, role, verified) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, username, email, address, role, verified`,
+       VALUES (\$1, \$2, \$3, \$4, \$5, \$6) RETURNING id, username, email, address, role, verified`,
       [pendingUser.username, pendingUser.email, pendingUser.password, pendingUser.address, 'user', true]
     );
 
@@ -184,7 +206,7 @@ router.post('/verify-otp', [
     delete otpStore[email];
     delete pendingRegistrations[email];
 
-    res.json({ 
+    res.json({
       message: 'Email verified successfully. Registration completed!',
       userId: newUser.rows[0].id,
       user: {
@@ -214,15 +236,15 @@ router.post('/login', [
 
     // Find user in DATABASE (only verified users exist here)
     const userResult = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      'SELECT * FROM users WHERE email = \$1',
       [email]
     );
 
     if (userResult.rows.length === 0) {
       // Check if user is in pending registration
       if (pendingRegistrations[email]) {
-        return res.status(400).json({ 
-          message: 'Please verify your email first. Check your inbox for OTP.' 
+        return res.status(400).json({
+          message: 'Please verify your email first. Check your inbox for OTP.'
         });
       }
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -297,7 +319,7 @@ router.post('/resend-otp', [
   }
 });
 
-// ... rest of your code (forgot password, update password, etc.) remains the same
+
 // Forgot password - send OTP
 router.post('/forgot-password', [
   body('email').isEmail().withMessage('Please provide a valid email')
@@ -310,9 +332,8 @@ router.post('/forgot-password', [
 
     const { email } = req.body;
 
-    // Check if user exists in DATABASE (verified users only)
     const userResult = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      'SELECT * FROM users WHERE email = \$1',
       [email]
     );
 
@@ -328,12 +349,12 @@ router.post('/forgot-password', [
       purpose: 'password_reset'
     };
 
-    const emailSent = await sendOTPEmail(email, otp);
+    const emailSent = await sendOTPEmail(email, otp, 'password_reset'); // Specify purpose
     if (!emailSent) {
       return res.status(500).json({ message: 'Failed to send OTP email' });
     }
 
-    res.json({ message: 'OTP sent successfully' });
+    res.json({ message: 'OTP sent successfully', email:email }); //send also email
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -354,7 +375,6 @@ router.post('/reset-password', [
 
     const { email, otp, newPassword } = req.body;
 
-    // Check if OTP exists and is valid
     const otpData = otpStore[email];
     if (!otpData || otpData.otp !== otp || otpData.purpose !== 'password_reset') {
       return res.status(400).json({ message: 'Invalid OTP' });
@@ -368,9 +388,8 @@ router.post('/reset-password', [
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update password in database
     await pool.query(
-      'UPDATE users SET password = $1 WHERE email = $2',
+      'UPDATE users SET password = \$1 WHERE email = \$2',
       [hashedPassword, email]
     );
 
@@ -395,7 +414,7 @@ router.put("/update-password", auth,
       }
 
       const { currentPassword, newPassword } = req.body;
-      const userResult = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+      const userResult = await pool.query("SELECT * FROM users WHERE id = \$1", [req.user.id]);
       const user = userResult.rows[0];
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -407,7 +426,7 @@ router.put("/update-password", auth,
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, req.user.id]);
+      await pool.query("UPDATE users SET password = \$1 WHERE id = \$2", [hashedPassword, req.user.id]);
       res.json({ message: "Password updated successfully" });
     } catch (error) {
       console.error("Update password error:", error);
@@ -418,7 +437,7 @@ router.put("/update-password", auth,
 
 router.delete("/delete-account", auth, async (req, res) => {
   try {
-    await pool.query("DELETE FROM users WHERE id = $1", [req.user.id]);
+    await pool.query("DELETE FROM users WHERE id = \$1", [req.user.id]);
     res.json({ message: "Account deleted successfully" });
   } catch (error) {
     console.error("Delete account error:", error);
@@ -430,7 +449,7 @@ router.get('/user-details', auth, async (req, res) => {
   try {
     const userId = req.user.id;
     const userResult = await pool.query(
-      'SELECT id, username, email, address, role, verified, created_at FROM users WHERE id = $1',
+      'SELECT id, username, email, address, role, verified, created_at FROM users WHERE id = \$1',
       [userId]
     );
     if (userResult.rows.length === 0) {
